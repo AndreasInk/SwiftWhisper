@@ -40,7 +40,6 @@ public class Whisper {
         self.unmanagedSelf = unmanagedSelf
         params.new_segment_callback_user_data = unmanagedSelf.toOpaque()
         params.encoder_begin_callback_user_data = unmanagedSelf.toOpaque()
-        params.progress_callback_user_data = unmanagedSelf.toOpaque()
 
         // swiftlint:disable line_length
         params.new_segment_callback = { (ctx: OpaquePointer?, _: OpaquePointer?, newSegmentCount: Int32, userData: UnsafeMutableRawPointer?) in
@@ -82,17 +81,6 @@ public class Whisper {
             }
 
             return true
-        }
-
-        // swiftlint:disable line_length
-        params.progress_callback = { (_: OpaquePointer?, _: OpaquePointer?, progress: Int32, userData: UnsafeMutableRawPointer?) in
-        // swiftlint:enable line_length
-            guard let userData = userData else { return }
-            let whisper = Unmanaged<Whisper>.fromOpaque(userData).takeUnretainedValue()
-
-            DispatchQueue.main.async {
-                whisper.delegate?.whisper(whisper, didUpdateProgress: Double(progress) / 100)
-            }
         }
     }
 
